@@ -36,3 +36,24 @@ export const maxScoresPerRow: Record<string, number> = {
   chance: 30,
   yatzy: 50,
 };
+
+export const displayNames: Record<string, string> = {
+  ones: "Ones",
+  twos: "Twos",
+  threes: "Threes",
+  fours: "Fours",
+  fives: "Fives",
+  sixes: "Sixes",
+  upperTotal: "Total",
+  bonus: "Bonus",
+  pair: "Pair",
+  twoPairs: "Two Pairs",
+  threeOfAKind: "Three of a Kind",
+  fourOfAKind: "Four of a Kind",
+  smallStraight: "Small Straight",
+  largeStraight: "Large Straight",
+  fullHouse: "Full House",
+  chance: "Chance",
+  yatzy: "Yatzy",
+  gameTotal: "Total",
+};

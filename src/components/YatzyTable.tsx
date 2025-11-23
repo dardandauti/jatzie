@@ -1,6 +1,7 @@
 import { useReducer } from "react";
 import "../index.css";
-import { rows, nonEditableCells } from "../consts";
+import { rows, nonEditableCells, displayNames } from "../consts";
+import { useLocale } from "../locale/LocaleContext";
 
 const YatzyTable = ({ players }: { players: string[] }) => {
   type PlayerRecord = Record<string, number | null>;
@@ -140,6 +141,8 @@ const YatzyTable = ({ players }: { players: string[] }) => {
 
   const [gameRecord, dispatch] = useReducer(reducer, players, makeInitialState);
 
+  const { t } = useLocale();
+
   function getGameRecord(player: string, row: string): number | undefined {
     const playerRec = gameRecord[player];
     if (!playerRec) return undefined;
@@ -193,7 +196,9 @@ const YatzyTable = ({ players }: { players: string[] }) => {
       <tbody>
         {rows.map((row) => (
           <tr key={row}>
-            <td className={`labelCell ${row}`}>{row}</td>
+            <td className={`labelCell ${row}`}>
+              {t(`rows.${row}`, displayNames[row])}
+            </td>
             {players.map((_, playerIndex) => (
               <td key={`${row}_${playerIndex}`} className={`valueCell ${row}`}>
                 {nonEditableCells.includes(row) ? (

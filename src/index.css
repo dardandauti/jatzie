@@ -1,0 +1,64 @@
+.outer {
+  display: flex;
+  justify-content: center;
+}
+
+.tableWrap {
+  display: inline-block;
+  transition: transform 200ms ease, transform-origin 200ms ease;
+}
+
+table {
+  border-collapse: collapse;
+  table-layout: auto;
+  width: auto;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial;
+  font-size: 14px;
+}
+
+table th {
+  text-align: center;
+  padding: 8px 12px;
+  border-bottom: 2px solid #ddd;
+  white-space: nowrap;
+}
+
+table td {
+  border-bottom: 1px solid #eee;
+  text-align: center;
+  min-width: 48px;
+  white-space: nowrap;
+}
+
+/* Vertical separators between player columns */
+table th,
+table td {
+  border-right: 1px solid #e6e6e6;
+}
+
+/* Remove right border on the last column so table edge looks clean */
+table th:last-child,
+table td:last-child {
+  border-right: none;
+}
+
+/* Keep the label column visually separated from player columns */
+.labelCell {
+  border-right: 1px solid #ddd;
+}
+
+.labelCell {
+  text-align: left;
+  padding: 6px 12px;
+  font-variant: small-caps;
+  color: #222;
+}
+
+.bold {
+  font-weight: 700;
+}
+
+.separator {
+  border-top: 2px solid #bbb;
+}

@@ -1,9 +1,13 @@
-import YahtzeeTable from "./components/YahtzeeTable";
+import YatzyTable from "./components/YatzyTable";
 
 function App() {
   const players = ["Alice", "Bob", "Charlie"];
 
-  return <YahtzeeTable players={players} />;
+  return (
+    <>
+      <YatzyTable players={players} />
+    </>
+  );
 }
 
 export default App;

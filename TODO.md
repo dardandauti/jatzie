@@ -1,0 +1,4 @@
+- Add front screen to start new game
+- Add modal to let user enter players names
+- add storage for saving games
+- add histry to see previous games locally

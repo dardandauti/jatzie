@@ -3,13 +3,21 @@ import { LocaleProvider, useLocale } from "./locale/LocaleContext";
 
 function LangSelector() {
   const { lang, setLang, available, t } = useLocale();
+  const flagMap: Record<string, string> = {
+    en: "🇬🇧",
+    sv: "🇸🇪",
+    sq: "🇦🇱",
+    fi: "🇫🇮",
+    it: "🇮🇹",
+    ja: "🇯🇵",
+  };
   return (
     <div style={{ marginBottom: 12 }}>
       <label style={{ marginRight: 8 }}>{t("ui.language")}</label>
       <select value={lang} onChange={(e) => setLang(e.currentTarget.value)}>
         {available.map((a) => (
           <option key={a} value={a}>
-            {a}
+            {flagMap[a] ?? a}
           </option>
         ))}
       </select>
@@ -22,10 +30,8 @@ function App() {
 
   return (
     <LocaleProvider>
-      <div style={{ padding: 12 }}>
-        <LangSelector />
-        <YatzyTable players={players} />
-      </div>
+      {/* <LangSelector /> */}
+      <YatzyTable players={players} />
     </LocaleProvider>
   );
 }

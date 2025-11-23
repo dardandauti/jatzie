@@ -1,6 +1,6 @@
 import { useReducer } from "react";
 import "../index.css";
-import { rows, nonEditableCells, maxScoresPerRow } from "../consts";
+import { rows, nonEditableCells } from "../consts";
 
 const YatzyTable = ({ players }: { players: string[] }) => {
   type PlayerRecord = Record<string, number | null>;
@@ -14,6 +14,7 @@ const YatzyTable = ({ players }: { players: string[] }) => {
 
   const DERIVED_KEYS = new Set(["upperTotal", "bonus", "gameTotal"]);
   const UPPER_KEYS = rows.slice(0, 6);
+  const BASE_KEYS = rows.filter((k) => !DERIVED_KEYS.has(k));
 
   const makeInitialState = (players: string[]): State => {
     return players.reduce((acc, player) => {
@@ -36,28 +37,32 @@ const YatzyTable = ({ players }: { players: string[] }) => {
         const newPlayer: PlayerRecord = { ...prevPlayer };
         newPlayer[row] = sanitized;
 
-        // recompute upper total and bonus (treat null as 0)
-        const upperSum = UPPER_KEYS.reduce(
-          (acc, key) => acc + (Number(newPlayer[key]) || 0),
-          0
-        );
-        newPlayer["upperTotal"] = upperSum;
-        newPlayer["bonus"] = upperSum >= 63 ? 50 : 0;
-
-        // recompute game total (sum of base scoring rows only - exclude derived rows), include bonus
-        const baseKeys = rows.filter((k) => !DERIVED_KEYS.has(k));
-        const bonusVal = Number(newPlayer["bonus"]) || 0;
-        const gameSum =
-          baseKeys.reduce(
+        // recompute derived values only when all base keys are filled for this player
+        const playerFinished = BASE_KEYS.every((k) => newPlayer[k] != null);
+        if (playerFinished) {
+          const upperSum = UPPER_KEYS.reduce(
             (acc, key) => acc + (Number(newPlayer[key]) || 0),
             0
-          ) + bonusVal;
-        newPlayer["gameTotal"] = gameSum;
+          );
+          newPlayer["upperTotal"] = upperSum;
+          newPlayer["bonus"] = upperSum >= 63 ? 50 : 0;
+          const bonusVal = Number(newPlayer["bonus"]) || 0;
+          const gameSum =
+            BASE_KEYS.reduce(
+              (acc, key) => acc + (Number(newPlayer[key]) || 0),
+              0
+            ) + bonusVal;
+          newPlayer["gameTotal"] = gameSum;
+        } else {
+          newPlayer["upperTotal"] = null;
+          newPlayer["bonus"] = null;
+          newPlayer["gameTotal"] = null;
+        }
 
         newState[player] = newPlayer;
         return newState;
       }
-      case "BULK_SET": {
+      /* case "BULK_SET": {
         const { player, changes } = action;
         const newState: State = { ...state };
         const prevPlayer = state[player] ?? {};
@@ -66,32 +71,64 @@ const YatzyTable = ({ players }: { players: string[] }) => {
           ...(changes as PlayerRecord),
         };
 
-        const upperSum = UPPER_KEYS.reduce(
-          (acc, key) => acc + (Number(newPlayer[key]) || 0),
-          0
-        );
-        newPlayer["upperTotal"] = upperSum;
-        newPlayer["bonus"] = upperSum >= 63 ? 50 : 0;
-        const baseKeys = rows.filter((k) => !DERIVED_KEYS.has(k));
-        const bonusVal = Number(newPlayer["bonus"]) || 0;
-        const gameSum =
-          baseKeys.reduce(
+        const playerFinished = BASE_KEYS.every((k) => newPlayer[k] != null);
+        if (playerFinished) {
+          const upperSum = UPPER_KEYS.reduce(
             (acc, key) => acc + (Number(newPlayer[key]) || 0),
             0
-          ) + bonusVal;
-        newPlayer["gameTotal"] = gameSum;
+          );
+          newPlayer["upperTotal"] = upperSum;
+          newPlayer["bonus"] = upperSum >= 63 ? 50 : 0;
+          const bonusVal = Number(newPlayer["bonus"]) || 0;
+          const gameSum =
+            BASE_KEYS.reduce(
+              (acc, key) => acc + (Number(newPlayer[key]) || 0),
+              0
+            ) + bonusVal;
+          newPlayer["gameTotal"] = gameSum;
+        } else {
+          newPlayer["upperTotal"] = null;
+          newPlayer["bonus"] = null;
+          newPlayer["gameTotal"] = null;
+        }
 
         newState[player] = newPlayer;
         return newState;
-      }
+      } */
       case "LOAD_STATE": {
-        return { ...action.state };
+        // Normalize loaded state so derived fields are only computed when base keys are complete
+        const loaded = action.state;
+        const normalized: State = {};
+        for (const p of Object.keys(loaded)) {
+          const playerRec = { ...loaded[p] } as PlayerRecord;
+          const playerFinished = BASE_KEYS.every((k) => playerRec[k] != null);
+          if (playerFinished) {
+            const upperSum = UPPER_KEYS.reduce(
+              (acc, key) => acc + (Number(playerRec[key]) || 0),
+              0
+            );
+            playerRec["upperTotal"] = upperSum;
+            playerRec["bonus"] = upperSum >= 63 ? 50 : 0;
+            const bonusVal = Number(playerRec["bonus"]) || 0;
+            playerRec["gameTotal"] =
+              BASE_KEYS.reduce(
+                (acc, key) => acc + (Number(playerRec[key]) || 0),
+                0
+              ) + bonusVal;
+          } else {
+            playerRec["upperTotal"] = null;
+            playerRec["bonus"] = null;
+            playerRec["gameTotal"] = null;
+          }
+          normalized[p] = playerRec;
+        }
+        return normalized;
       }
       case "RESET_PLAYER": {
         const { player } = action;
         const newState: State = { ...state };
         newState[player] = rows.reduce((rowAcc, row) => {
-          rowAcc[row] = 0;
+          rowAcc[row] = null;
           return rowAcc;
         }, {} as PlayerRecord);
         return newState;
@@ -110,6 +147,25 @@ const YatzyTable = ({ players }: { players: string[] }) => {
     return val == null ? undefined : typeof val === "number" ? val : undefined;
   }
 
+  function handleRawInput(player: string, row: string, raw: string) {
+    const trimmed = raw.trim();
+    // allow empty => clear, single '-' => struck (0), or digits only
+    if (trimmed === "") {
+      setGameRecord(player, row, null);
+      return;
+    }
+    if (trimmed === "-") {
+      setGameRecord(player, row, 0);
+      return;
+    }
+    if (/^[0-9]+$/.test(trimmed)) {
+      const parsed = parseInt(trimmed, 10);
+      setGameRecord(player, row, Number.isFinite(parsed) ? parsed : null);
+      return;
+    }
+    // otherwise ignore invalid input
+  }
+
   function setGameRecord(
     player: string,
     row: string,
@@ -118,11 +174,10 @@ const YatzyTable = ({ players }: { players: string[] }) => {
     dispatch({ type: "SET_CELL", player, row, value });
   }
 
-  const baseKeys = rows.filter((k) => !DERIVED_KEYS.has(k));
   const isGameFinished =
     Object.values(gameRecord).length > 0 &&
     players.every((p) =>
-      baseKeys.every((k) => gameRecord[p] && gameRecord[p][k] != null)
+      BASE_KEYS.every((k) => gameRecord[p] && gameRecord[p][k] != null)
     );
 
   return (
@@ -153,25 +208,33 @@ const YatzyTable = ({ players }: { players: string[] }) => {
                 ) : (
                   <input
                     type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     id={`${row}_${playerIndex}`}
-                    onChange={(e) => {
-                      const raw = e.currentTarget.value.trim();
-                      if (raw === "") {
-                        setGameRecord(players[playerIndex], row, null);
-                        return;
+                    onKeyDown={(e) => {
+                      const allowed = [
+                        "Backspace",
+                        "Delete",
+                        "ArrowLeft",
+                        "ArrowRight",
+                        "Home",
+                        "End",
+                        "Tab",
+                        "Enter",
+                      ];
+                      if (allowed.includes(e.key)) return;
+                      // allow digits and dash only
+                      if (e.key.length === 1 && !/[0-9-]/.test(e.key)) {
+                        e.preventDefault();
                       }
-                      if (raw === "-") {
-                        // struck cell, count as zero but considered filled
-                        setGameRecord(players[playerIndex], row, 0);
-                        return;
-                      }
-                      const parsed = parseInt(raw, 10);
-                      setGameRecord(
+                    }}
+                    onChange={(e) =>
+                      handleRawInput(
                         players[playerIndex],
                         row,
-                        Number.isFinite(parsed) ? parsed : null
-                      );
-                    }}
+                        e.currentTarget.value
+                      )
+                    }
                   />
                 )}
               </td>

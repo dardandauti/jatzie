@@ -32,7 +32,7 @@ function App() {
 
   return (
     <LocaleProvider>
-      {/* <LangSelector /> */}
+      <LangSelector />
       {players.length === 0 ? (
         <AddPlayers setPlayers={setPlayers} />
       ) : (

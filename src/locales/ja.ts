@@ -25,6 +25,9 @@ export const ja: Translations = createLocale({
   ui: {
     players: "プレイヤー",
     language: "言語",
+    add: "追加",
+    startGame: "ゲームを開始",
+    playerNamePlaceholder: "プレイヤー名",
   },
 });
 

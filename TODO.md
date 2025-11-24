@@ -1,4 +1,6 @@
-- Add front screen to start new game
-- Add modal to let user enter players names
 - add storage for saving games
 - add histry to see previous games locally
+- Fix styling of "components"
+- codespliting
+- style dropdown of languages
+- add menu to yatzy.button

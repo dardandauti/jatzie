@@ -25,6 +25,9 @@ export const sq: Translations = createLocale({
   ui: {
     players: "Lojtarët",
     language: "Gjuha",
+    add: "Shtoj",
+    startGame: "Fillo lojën",
+    playerNamePlaceholder: "Emri i lojtarit",
   },
 });
 

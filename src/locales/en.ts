@@ -24,6 +24,9 @@ export const en: Translations = createLocale({
   ui: {
     players: "Players",
     language: "Language",
+    add: "Add",
+    startGame: "Start game",
+    playerNamePlaceholder: "Player name",
   },
 });
 

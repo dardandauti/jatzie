@@ -1,5 +1,5 @@
 import { useReducer } from "react";
-import "../index.css";
+import "../styles/yatzyTable.css";
 import { rows, nonEditableCells, displayNames } from "../consts";
 import { useLocale } from "../locale/LocaleContext";
 

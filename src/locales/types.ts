@@ -7,6 +7,9 @@ export type Translations = {
   ui: {
     players: string;
     language: string;
+    add: string;
+    startGame: string;
+    playerNamePlaceholder: string;
   };
 };
 

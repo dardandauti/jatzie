@@ -32,12 +32,14 @@ function App() {
 
   return (
     <LocaleProvider>
-      <LangSelector />
-      {players.length === 0 ? (
-        <AddPlayers setPlayers={setPlayers} />
-      ) : (
-        <YatzyTable players={players} />
-      )}
+      <div className="root-app-container">
+        <LangSelector />
+        {players.length === 0 ? (
+          <AddPlayers setPlayers={setPlayers} />
+        ) : (
+          <YatzyTable players={players} />
+        )}
+      </div>
     </LocaleProvider>
   );
 }

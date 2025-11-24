@@ -25,6 +25,9 @@ export const sv: Translations = createLocale({
   ui: {
     players: "Spelare",
     language: "Språk",
+    add: "Lägg till",
+    startGame: "Starta spel",
+    playerNamePlaceholder: "Spelarens namn",
   },
 });
 

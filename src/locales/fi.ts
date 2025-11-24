@@ -25,6 +25,9 @@ export const fi: Translations = createLocale({
   ui: {
     players: "Pelaajat",
     language: "Kieli",
+    add: "Lisätä",
+    startGame: "Aloita peli",
+    playerNamePlaceholder: "Pelaajan nimi",
   },
 });
 

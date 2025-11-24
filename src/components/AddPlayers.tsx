@@ -1,4 +1,6 @@
 import { useState } from "react";
+import "../styles/addPlayer.css";
+import Button from "./Button";
 
 const AddPlayers = ({
   setPlayers,
@@ -36,14 +38,15 @@ const AddPlayers = ({
           }}
           placeholder="Player name"
         />
-        <button onClick={addPlayer}>Add</button>
+        <Button onClick={addPlayer}>Add</Button>
       </div>
-      <button
+      <Button
         disabled={players.length === 0}
         onClick={() => setPlayers(players)}
+        fullWidth
       >
         Start Game
-      </button>
+      </Button>
     </div>
   );
 };

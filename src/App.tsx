@@ -1,3 +1,5 @@
+import { useState } from "react";
+import AddPlayers from "./components/AddPlayers";
 import YatzyTable from "./components/YatzyTable";
 import { LocaleProvider, useLocale } from "./locale/LocaleContext";
 
@@ -12,8 +14,8 @@ function LangSelector() {
     ja: "🇯🇵",
   };
   return (
-    <div style={{ marginBottom: 12 }}>
-      <label style={{ marginRight: 8 }}>{t("ui.language")}</label>
+    <div>
+      <label>{t("ui.language")}</label>
       <select value={lang} onChange={(e) => setLang(e.currentTarget.value)}>
         {available.map((a) => (
           <option key={a} value={a}>
@@ -26,12 +28,16 @@ function LangSelector() {
 }
 
 function App() {
-  const players = ["Alice", "Bob", "Charlie"];
+  const [players, setPlayers] = useState<string[]>([]);
 
   return (
     <LocaleProvider>
       {/* <LangSelector /> */}
-      <YatzyTable players={players} />
+      {players.length === 0 ? (
+        <AddPlayers setPlayers={setPlayers} />
+      ) : (
+        <YatzyTable players={players} />
+      )}
     </LocaleProvider>
   );
 }

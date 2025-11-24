@@ -9,7 +9,6 @@ const YatzyTable = ({ players }: { players: string[] }) => {
 
   type Action =
     | { type: "SET_CELL"; player: string; row: string; value: number | null }
-    | { type: "BULK_SET"; player: string; changes: Partial<PlayerRecord> }
     | { type: "LOAD_STATE"; state: State }
     | { type: "RESET_PLAYER"; player: string };
 
@@ -63,39 +62,6 @@ const YatzyTable = ({ players }: { players: string[] }) => {
         newState[player] = newPlayer;
         return newState;
       }
-      /* case "BULK_SET": {
-        const { player, changes } = action;
-        const newState: State = { ...state };
-        const prevPlayer = state[player] ?? {};
-        const newPlayer: PlayerRecord = {
-          ...prevPlayer,
-          ...(changes as PlayerRecord),
-        };
-
-        const playerFinished = BASE_KEYS.every((k) => newPlayer[k] != null);
-        if (playerFinished) {
-          const upperSum = UPPER_KEYS.reduce(
-            (acc, key) => acc + (Number(newPlayer[key]) || 0),
-            0
-          );
-          newPlayer["upperTotal"] = upperSum;
-          newPlayer["bonus"] = upperSum >= 63 ? 50 : 0;
-          const bonusVal = Number(newPlayer["bonus"]) || 0;
-          const gameSum =
-            BASE_KEYS.reduce(
-              (acc, key) => acc + (Number(newPlayer[key]) || 0),
-              0
-            ) + bonusVal;
-          newPlayer["gameTotal"] = gameSum;
-        } else {
-          newPlayer["upperTotal"] = null;
-          newPlayer["bonus"] = null;
-          newPlayer["gameTotal"] = null;
-        }
-
-        newState[player] = newPlayer;
-        return newState;
-      } */
       case "LOAD_STATE": {
         // Normalize loaded state so derived fields are only computed when base keys are complete
         const loaded = action.state;

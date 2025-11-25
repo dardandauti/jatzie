@@ -12,3 +12,8 @@ button {
 .fullWidth {
   width: 100%;
 }
+
+button:disabled {
+  background-color: grey;
+  cursor: not-allowed;
+}
